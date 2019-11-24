@@ -1,0 +1,57 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.control;
+
+import java.io.IOException;
+import java.sql.Connection;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.CategoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.ICategoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.utils.ConnectionFactory;
+
+@WebServlet("/delete-category")
+public class DeleteCategoryServlet extends HttpServlet {
+	private static final long serialVersionUID = 4864157453195742620L;
+
+	public DeleteCategoryServlet() {
+        super();
+    }
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ConnectionFactory factory = new ConnectionFactory();
+		Connection connection = null;
+		
+		try {
+    		connection = factory.createConnection();
+    	
+    		ICategoryDAO dao = new CategoryDAO(connection);
+			Integer id = Integer.parseInt(request.getParameter("id"));
+    		dao.delete(id); 
+			
+			System.out.println("DeleteCategoryServlet :: id: " + id);
+    		
+    		String message = "Category successfully deleted!";
+    		request.setAttribute("message", message);
+    		RequestDispatcher despachante = request.getRequestDispatcher("/list-categories");
+    		
+    		despachante.forward(request, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			request.setAttribute("message", "UNKNOWN ERROR");
+			RequestDispatcher rd = request.getRequestDispatcher("/list-categories.jsp");
+	        rd.forward(request, response);
+		} finally {
+			factory.closeConnection(connection);
+		}
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
+}

@@ -1,0 +1,179 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.model;
+
+import java.io.Serializable;
+
+public class ProductReport implements Serializable {
+	private static final long serialVersionUID = 1722246962441043914L;
+	
+	private int id;
+	private String sku;
+	private String name;
+	private String description;
+	private int subcategoryId;
+	private String subcategoryName;
+	private String purchasePrice;
+	private String salePrice;
+	private String unitOfMeasurement;
+	private String barCode;
+	private int stockLevel;
+	private int minimumStockLevel;
+	private int maximumStockLevel;
+
+	public ProductReport() {
+		super();
+	}
+
+	public ProductReport(int id, String sku, String name, String description, int subcategoryId, String subcategoryName,
+			String purchasePrice, String salePrice, String unitOfMeasurement, String barCode, int stockLevel,
+			int minimumStockLevel, int maximumStockLevel) {
+		super();
+		this.id = id;
+		this.sku = sku;
+		this.name = name;
+		this.description = description;
+		this.subcategoryId = subcategoryId;
+		this.subcategoryName = subcategoryName;
+		this.purchasePrice = purchasePrice;
+		this.salePrice = salePrice;
+		this.unitOfMeasurement = unitOfMeasurement;
+		this.barCode = barCode;
+		this.stockLevel = stockLevel;
+		this.minimumStockLevel = minimumStockLevel;
+		this.maximumStockLevel = maximumStockLevel;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getSku() {
+		return sku;
+	}
+
+	public void setSku(String sku) {
+		this.sku = sku;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public int getSubcategoryId() {
+		return subcategoryId;
+	}
+
+	public void setSubcategoryId(int subcategoryId) {
+		this.subcategoryId = subcategoryId;
+	}
+
+	public String getSubcategoryName() {
+		return subcategoryName;
+	}
+
+	public void setSubcategoryName(String subcategoryName) {
+		this.subcategoryName = subcategoryName;
+	}
+
+	public String getPurchasePrice() {
+		return purchasePrice;
+	}
+
+	public void setPurchasePrice(String purchasePrice) {
+		this.purchasePrice = purchasePrice;
+	}
+
+	public String getSalePrice() {
+		return salePrice;
+	}
+
+	public void setSalePrice(String salePrice) {
+		this.salePrice = salePrice;
+	}
+
+	public String getUnitOfMeasurement() {
+		return unitOfMeasurement;
+	}
+
+	public void setUnitOfMeasurement(String unitOfMeasurement) {
+		this.unitOfMeasurement = unitOfMeasurement;
+	}
+
+	public String getBarCode() {
+		return barCode;
+	}
+
+	public void setBarCode(String barCode) {
+		this.barCode = barCode;
+	}
+
+	public int getStockLevel() {
+		return stockLevel;
+	}
+
+	public void setStockLevel(int stockLevel) {
+		this.stockLevel = stockLevel;
+	}
+
+	public int getMinimumStockLevel() {
+		return minimumStockLevel;
+	}
+
+	public void setMinimumStockLevel(int minimumStockLevel) {
+		this.minimumStockLevel = minimumStockLevel;
+	}
+
+	public int getMaximumStockLevel() {
+		return maximumStockLevel;
+	}
+
+	public void setMaximumStockLevel(int maximumStockLevel) {
+		this.maximumStockLevel = maximumStockLevel;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ProductReport other = (ProductReport) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "ProductReport [id=" + id + ", sku=" + sku + ", name=" + name + ", description=" + description
+				+ ", subcategoryId=" + subcategoryId + ", subcategoryName=" + subcategoryName + ", purchasePrice="
+				+ purchasePrice + ", salePrice=" + salePrice + ", unitOfMeasurement=" + unitOfMeasurement + ", barCode="
+				+ barCode + ", stockLevel=" + stockLevel + ", minimumStockLevel=" + minimumStockLevel
+				+ ", maximumStockLevel=" + maximumStockLevel + "]";
+	}
+}

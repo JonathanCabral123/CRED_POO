@@ -1,0 +1,114 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.ICategoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.model.Category;
+
+public class CategoryDAO implements ICategoryDAO {
+	private Connection connection = null;
+
+	public CategoryDAO(Connection connection) {
+		this.connection = connection;
+	}
+
+	@Override
+	public void insert(Category category) throws SQLException {
+
+		String SQL = "INSERT INTO tb_category (ds_name, ds_description, nr_deleted, dt_insert, ds_iusername) "
+				+ " VALUES (?, ?, ?, now(), 'system')";
+
+		PreparedStatement ps = this.connection.prepareStatement(SQL);
+		ps.setString(1, category.getName());
+		ps.setString(2, category.getDescription());
+		ps.setBoolean(3, category.isDeleted());
+
+		ps.execute();
+
+	}
+
+	@Override
+	public List<Category> list() throws SQLException {
+		
+		List<Category> categories = new ArrayList<Category>();
+		ResultSet rs = null;
+		
+		String SQL = "SELECT id, ds_name, ds_description, nr_deleted "
+						 + " FROM tb_category "
+						 + " WHERE nr_deleted=0 "
+						 + " ORDER BY id";
+		
+		PreparedStatement ps = this.connection.prepareStatement(SQL);
+		rs = ps.executeQuery();
+		
+		while (rs.next()) {
+			int id = rs.getInt(1);
+			String name = rs.getString(2);
+			String description = rs.getString(3);
+			boolean deleted = rs.getBoolean(4);
+			
+			Category c = new Category(id, name, description, deleted);
+
+			categories.add(c);
+		}
+		
+		return categories;
+	}
+
+	@Override
+	public Boolean delete(int id) throws SQLException {
+
+		String SQL = "UPDATE tb_category SET nr_deleted=1  WHERE id = ?";
+
+		PreparedStatement ps = this.connection.prepareStatement(SQL);
+		ps.setInt(1, id);
+
+		return ps.execute();
+	}
+
+	@Override
+	public Boolean update(Category category) throws SQLException {
+
+		String SQL = "UPDATE tb_category SET ds_name=?, ds_description=?, nr_deleted=?, dt_update=now(), ds_uusername='system' WHERE id = ?";
+
+		PreparedStatement ps = this.connection.prepareStatement(SQL);
+		ps.setString(1, category.getName());
+		ps.setString(2, category.getDescription());
+		ps.setInt(3, 0);
+		ps.setInt(4, category.getId());
+
+		return ps.execute();
+	}
+
+	@Override
+	public Category findById(int _id) throws SQLException {
+		ResultSet rs = null;
+		Category category = null;
+
+		String SQL = "SELECT id, ds_name, ds_description, nr_deleted "
+				 + " FROM tb_category "
+				 + " WHERE nr_deleted=0 AND id = ?";
+
+		PreparedStatement ps = this.connection.prepareStatement(SQL);
+		ps.setInt(1, _id);
+
+		rs = ps.executeQuery();
+
+		if (rs.next()) {
+
+			int id = rs.getInt(1);
+			String name = rs.getString(2);
+			String description = rs.getString(3);
+			boolean deleted = rs.getBoolean(4);
+			
+			category = new Category(id, name, description, deleted);
+
+		}
+		return category;
+	}
+}

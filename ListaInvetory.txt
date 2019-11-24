@@ -1,0 +1,57 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.control;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.InventoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.IInventoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.model.Inventory;
+import br.edu.unilasalle.si.supermarketinventorymanagement.utils.ConnectionFactory;
+
+@WebServlet("/list-inventories")
+public class ListInventoryServlet extends HttpServlet {
+	private static final long serialVersionUID = 8536442228823760955L;
+
+	public ListInventoryServlet() {
+        super();
+    }
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ConnectionFactory factory = new ConnectionFactory();
+		Connection connection = null;
+		try {
+			connection = factory.createConnection(); 
+			
+			IInventoryDAO dao = new InventoryDAO(connection);
+			List<Inventory> inventories = dao.list(); 
+			
+			request.setAttribute("inventories", inventories);
+			
+			System.out.println("ListInventoriesServlet :: inventories: " + inventories);
+			
+			RequestDispatcher rd = request.getRequestDispatcher("/list-inventories.jsp");
+			rd.forward(request, response);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			request.setAttribute("message", "UNKNOWN ERROR");
+			RequestDispatcher rd = request.getRequestDispatcher("/list-inventories.jsp");
+	        rd.forward(request, response);
+		} finally {
+			factory.closeConnection(connection);
+		}
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
+}

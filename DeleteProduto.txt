@@ -1,0 +1,58 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.control;
+
+import java.io.IOException;
+import java.sql.Connection;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.ProductDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.IProductDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.utils.ConnectionFactory;
+
+@WebServlet("/delete-product")
+public class DeleteProductServlet extends HttpServlet {
+	private static final long serialVersionUID = 4016914522430163488L;
+
+	public DeleteProductServlet() {
+        super();
+    }
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ConnectionFactory factory = new ConnectionFactory();
+		Connection connection = null;
+		
+		try {
+    		connection = factory.createConnection();
+    	
+    		IProductDAO dao = new ProductDAO(connection);
+			Integer id = Integer.parseInt(request.getParameter("id"));
+    		dao.delete(id); 
+			
+			System.out.println("DeleteProductServlet :: id: " + id);
+    		
+    		String message = "Product successfully deleted!";
+    		request.setAttribute("message", message);
+    		RequestDispatcher despachante = request.getRequestDispatcher("/list-products");
+    		
+    		despachante.forward(request, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			request.setAttribute("message", "UNKNOWN ERROR");
+			RequestDispatcher rd = request.getRequestDispatcher("/list-products.jsp");
+	        rd.forward(request, response);
+		} finally {
+			factory.closeConnection(connection);
+		}
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
+
+}

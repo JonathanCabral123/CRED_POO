@@ -1,0 +1,133 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.IInventoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.model.Inventory;
+
+public class InventoryDAO implements IInventoryDAO {
+	private Connection connection = null;
+
+	public InventoryDAO(Connection connection) {
+		this.connection = connection;
+	}
+
+	@Override
+	public void insert(Inventory inventory) throws SQLException {
+
+		String SQL = "INSERT INTO tb_inventory (fk_product_id, nr_stock_level, nr_minimum_stock_level, nr_maximum_stock_level, nr_deleted, dt_insert, ds_iusername) "
+				+ " VALUES (?, ?, ?, ?, ?, now(), 'system')";
+
+		PreparedStatement ps = this.connection.prepareStatement(SQL);
+		ps.setInt(1, inventory.getProductId());
+		ps.setInt(2, inventory.getStockLevel());
+		ps.setInt(3, inventory.getMinimumStockLevel());
+		ps.setInt(4, inventory.getMaximumStockLevel());
+		ps.setBoolean(5, inventory.isDeleted());
+
+		ps.execute();
+
+	}
+
+	@Override
+	public List<Inventory> list() throws SQLException {
+		
+		List<Inventory> inventories = new ArrayList<Inventory>();
+		ResultSet rs = null;
+		
+		String SQL = "SELECT i.id, p.id, p.ds_name, i.nr_stock_level, i.nr_minimum_stock_level, i.nr_maximum_stock_level, i.nr_deleted "
+					 + " FROM tb_inventory i, tb_product p"
+					 + " WHERE p.id=i.fk_product_id "
+					 + "	AND p.nr_deleted=0 "
+					 + "	AND i.nr_deleted=0 "
+					 + " ORDER BY i.id";
+		
+		PreparedStatement ps = this.connection.prepareStatement(SQL);
+		rs = ps.executeQuery();
+		
+		while (rs.next()) {
+			int id = rs.getInt(1);
+			int productId = rs.getInt(2);
+			String productName = rs.getString(3);
+			int stockLevel = rs.getInt(4);
+			int minimumStockLevel = rs.getInt(5);
+			int maximumStockLevel = rs.getInt(6);
+			boolean deleted = rs.getBoolean(7);
+			
+			Inventory i = new Inventory(id, productId, productName, stockLevel, minimumStockLevel, maximumStockLevel,
+					deleted);
+
+			inventories.add(i);
+		}
+		
+		return inventories;
+	}
+
+	@Override
+	public Boolean delete(int id) throws SQLException {
+
+		String SQL = "UPDATE tb_inventory SET nr_deleted=1  WHERE id = ?";
+
+		PreparedStatement ps = this.connection.prepareStatement(SQL);
+		ps.setInt(1, id);
+
+		return ps.execute();
+	}
+
+	@Override
+	public Boolean update(Inventory inventory) throws SQLException {
+
+		String SQL = "UPDATE tb_inventory SET fk_product_id=?, nr_stock_level=?, nr_minimum_stock_level=?, "
+				+ " nr_maximum_stock_level=?, nr_deleted=?, dt_update=now(), ds_uusername='system' "
+				+ " WHERE id = ?";
+
+		PreparedStatement ps = this.connection.prepareStatement(SQL);
+		ps.setInt(1, inventory.getProductId());
+		ps.setInt(2, inventory.getStockLevel());
+		ps.setInt(3, inventory.getMinimumStockLevel());
+		ps.setInt(4, inventory.getMaximumStockLevel());
+		ps.setInt(5, 0);
+		ps.setInt(6, inventory.getId());
+
+		return ps.execute();
+	}
+
+	@Override
+	public Inventory findById(int _id) throws SQLException {
+		ResultSet rs = null;
+		Inventory inventory = null;
+
+		String SQL = "SELECT i.id, p.id, p.ds_name, i.nr_stock_level, i.nr_minimum_stock_level, i.nr_maximum_stock_level, i.nr_deleted "
+				 + " FROM tb_inventory i, tb_product p"
+				 + " WHERE p.id=i.fk_product_id "
+				 + "	AND p.nr_deleted=0 "
+				 + "	AND i.nr_deleted=0 "
+				 + "	AND i.id = ?";
+
+		PreparedStatement ps = this.connection.prepareStatement(SQL);
+		ps.setInt(1, _id);
+
+		rs = ps.executeQuery();
+
+		if (rs.next()) {
+
+			int id = rs.getInt(1);
+			int productId = rs.getInt(2);
+			String productName = rs.getString(3);
+			int stockLevel = rs.getInt(4);
+			int minimumStockLevel = rs.getInt(5);
+			int maximumStockLevel = rs.getInt(6);
+			boolean deleted = rs.getBoolean(7);
+			
+			inventory = new Inventory(id, productId, productName, stockLevel, minimumStockLevel, maximumStockLevel,
+					deleted);
+
+		}
+		return inventory;
+	}
+}

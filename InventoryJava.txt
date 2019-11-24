@@ -1,0 +1,153 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.model;
+
+import java.io.Serializable;
+import java.util.Date;
+
+public class Inventory implements Serializable {
+	private static final long serialVersionUID = 110941872570259075L;
+	
+	private int id;
+	private int productId;
+	private String productName;
+	private int stockLevel;
+	private int minimumStockLevel;
+	private int maximumStockLevel;
+	private boolean deleted;
+	private Date dtInsert;
+	private String iUsername;
+	private Date dtUpdate;
+	private String uUsename;
+	
+	public Inventory() {
+		super();
+	}
+	
+	public Inventory(int id, int productId, String productName, int stockLevel, int minimumStockLevel, int maximumStockLevel, boolean deleted) {
+		super();
+		this.id = id;
+		this.productId = productId;
+		this.productName = productName;
+		this.stockLevel = stockLevel;
+		this.minimumStockLevel = minimumStockLevel;
+		this.maximumStockLevel = maximumStockLevel;
+		this.deleted = deleted;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public int getProductId() {
+		return productId;
+	}
+
+	public void setProductId(int productId) {
+		this.productId = productId;
+	}
+	
+	public String getProductName() {
+		return productName;
+	}
+
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
+
+	public int getStockLevel() {
+		return stockLevel;
+	}
+
+	public void setStockLevel(int stockLevel) {
+		this.stockLevel = stockLevel;
+	}
+
+	public int getMinimumStockLevel() {
+		return minimumStockLevel;
+	}
+
+	public void setMinimumStockLevel(int minimumStockLevel) {
+		this.minimumStockLevel = minimumStockLevel;
+	}
+
+	public int getMaximumStockLevel() {
+		return maximumStockLevel;
+	}
+
+	public void setMaximumStockLevel(int maximumStockLevel) {
+		this.maximumStockLevel = maximumStockLevel;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
+
+	public Date getDtInsert() {
+		return dtInsert;
+	}
+
+	public void setDtInsert(Date dtInsert) {
+		this.dtInsert = dtInsert;
+	}
+
+	public String getiUsername() {
+		return iUsername;
+	}
+
+	public void setiUsername(String iUsername) {
+		this.iUsername = iUsername;
+	}
+
+	public Date getDtUpdate() {
+		return dtUpdate;
+	}
+
+	public void setDtUpdate(Date dtUpdate) {
+		this.dtUpdate = dtUpdate;
+	}
+
+	public String getuUsename() {
+		return uUsename;
+	}
+
+	public void setuUsename(String uUsename) {
+		this.uUsename = uUsename;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Inventory other = (Inventory) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Inventory [id=" + id + ", productId=" + productId + ", productName=" + productName + ", stockLevel="
+				+ stockLevel + ", minimumStockLevel=" + minimumStockLevel + ", maximumStockLevel=" + maximumStockLevel
+				+ ", deleted=" + deleted + ", dtInsert=" + dtInsert + ", iUsername=" + iUsername + ", dtUpdate="
+				+ dtUpdate + ", uUsename=" + uUsename + "]";
+	}
+}

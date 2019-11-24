@@ -1,0 +1,80 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.control;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.CategoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.SubcategoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.ICategoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.ISubcategoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.model.Category;
+import br.edu.unilasalle.si.supermarketinventorymanagement.model.Subcategory;
+import br.edu.unilasalle.si.supermarketinventorymanagement.utils.ConnectionFactory;
+import br.edu.unilasalle.si.supermarketinventorymanagement.utils.Strings;
+
+@WebServlet("/add-subcategory")
+public class InsertSubcategoryServlet extends HttpServlet {
+	private static final long serialVersionUID = 405440179570999289L;
+
+	public InsertSubcategoryServlet() {
+        super();
+    }
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ConnectionFactory factory = new ConnectionFactory();
+		Connection connection = null;
+		try {
+			connection = factory.createConnection();
+			if (request.getParameter("action").trim().equalsIgnoreCase("view")) {
+				
+				ICategoryDAO dao = new CategoryDAO(connection);
+				List<Category> categories = dao.list(); 
+				
+				request.setAttribute("categories", categories);
+				
+				System.out.println("InsertSubcategoryServlet :: view :: categories: " + categories);
+				
+				RequestDispatcher despachante = request.getRequestDispatcher("/add-subcategory.jsp");
+	    		despachante.forward(request, response);
+				
+			} else if (request.getParameter("action").trim().equalsIgnoreCase("insert")) {
+				Subcategory subcategory = new Subcategory();
+				subcategory.setName(Strings.emptyIfNull(request.getParameter("name"))); 
+				subcategory.setDescription(Strings.emptyIfNull(request.getParameter("description"))); 
+				subcategory.setCategoryId(Integer.parseInt(request.getParameter("category")));
+				subcategory.setDeleted(false);
+	
+				System.out.println("InsertSubcategoryServlet :: insert :: subcategory: " + subcategory);
+				
+	    		ISubcategoryDAO dao = new SubcategoryDAO(connection);  
+				dao.insert(subcategory);
+				
+				String message = "Subcategory successfully inserted!";
+	    		request.setAttribute("message", message);
+	    		RequestDispatcher rd = request.getRequestDispatcher("/list-subcategories");
+	    		rd.forward(request, response);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			request.setAttribute("message", "UNKNOWN ERROR");
+			RequestDispatcher rd = request.getRequestDispatcher("/add-subcategory.jsp");
+	        rd.forward(request, response);
+		} finally {
+			factory.closeConnection(connection);
+		}
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
+
+}

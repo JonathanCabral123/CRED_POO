@@ -1,0 +1,57 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.control;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.GenerateReportDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.IGenerateReportDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.model.ProductReport;
+import br.edu.unilasalle.si.supermarketinventorymanagement.utils.ConnectionFactory;
+
+@WebServlet("/generate-report")
+public class GenerateReportServlet extends HttpServlet {
+	private static final long serialVersionUID = 8536442228823760955L;
+
+	public GenerateReportServlet() {
+        super();
+    }
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ConnectionFactory factory = new ConnectionFactory();
+		Connection connection = null;
+		try {
+			connection = factory.createConnection(); 
+			
+			IGenerateReportDAO dao = new GenerateReportDAO(connection);
+			List<ProductReport> items = dao.listByMinimumStockLevel(); 
+			
+			request.setAttribute("items", items);
+			
+			System.out.println("GenerateReportServlet :: product report: " + items);
+			
+			RequestDispatcher despachante = request.getRequestDispatcher("/product-report.jsp");
+			despachante.forward(request, response);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			request.setAttribute("message", "UNKNOWN ERROR");
+			RequestDispatcher rd = request.getRequestDispatcher("/product-report.jsp");
+	        rd.forward(request, response);
+		} finally {
+			factory.closeConnection(connection);
+		}
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
+}

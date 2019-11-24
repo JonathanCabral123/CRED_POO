@@ -1,0 +1,79 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.control;
+
+import java.io.IOException;
+import java.sql.Connection;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.CategoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.ICategoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.model.Category;
+import br.edu.unilasalle.si.supermarketinventorymanagement.utils.ConnectionFactory;
+import br.edu.unilasalle.si.supermarketinventorymanagement.utils.Strings;
+
+@WebServlet("/update-category")
+public class UpdateCategoryServlet extends HttpServlet {
+	private static final long serialVersionUID = 430240684442267530L;
+
+	public UpdateCategoryServlet() {
+        super();
+    }
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ConnectionFactory factory = new ConnectionFactory();
+		Connection connection = null;
+		try {
+			connection = factory.createConnection();
+			ICategoryDAO dao = new CategoryDAO(connection); 
+    	
+			if (request.getParameter("action").trim().equalsIgnoreCase("view")) {
+				Category category = dao.findById(Integer.valueOf((String) request.getParameter("id"))); 
+				
+				String message = "Category successfully found!";
+	    		request.setAttribute("message", message);
+	    		request.setAttribute("category", category);
+	    		
+	    		System.out.println("UpdateCategoryServlet :: view :: category: " + category);
+	    		
+	    		RequestDispatcher despachante = request.getRequestDispatcher("/update-category.jsp");
+	    		despachante.forward(request, response);
+				
+			} else if (request.getParameter("action").trim().equalsIgnoreCase("update")) {
+				Category category = new Category();
+				category.setId(Integer.parseInt(request.getParameter("id")));
+				category.setName(Strings.emptyIfNull(request.getParameter("name")));
+				category.setDescription(Strings.emptyIfNull(request.getParameter("description"))); 
+				category.setDeleted(false);
+				
+				System.out.println("UpdateCategoryServlet :: update :: category: " + category);
+	    		
+	    		dao.update(category);
+	    		
+	    		String message = "Category successfully changed!";
+	    		request.setAttribute("message", message);
+	    		RequestDispatcher despachante = request.getRequestDispatcher("/list-categories");
+	    		
+	    		despachante.forward(request, response);
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			
+			request.setAttribute("message", "UNKNOWN ERROR");
+			RequestDispatcher rd = request.getRequestDispatcher("/update-category.jsp");
+	        rd.forward(request, response);
+		} finally {
+			factory.closeConnection(connection);
+		}
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
+
+}

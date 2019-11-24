@@ -1,0 +1,15 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import br.edu.unilasalle.si.supermarketinventorymanagement.model.Inventory;
+
+public interface IInventoryDAO {
+
+	public void insert(Inventory inventory) throws SQLException;
+	public List<Inventory> list() throws SQLException;
+	public Boolean delete(int id) throws SQLException;
+	public Boolean update(Inventory inventory) throws SQLException;
+	public Inventory findById(int id) throws SQLException;
+}

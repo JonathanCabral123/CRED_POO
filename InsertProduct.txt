@@ -1,0 +1,85 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.control;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.ProductDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.SubcategoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.IProductDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.ISubcategoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.model.Product;
+import br.edu.unilasalle.si.supermarketinventorymanagement.model.Subcategory;
+import br.edu.unilasalle.si.supermarketinventorymanagement.utils.ConnectionFactory;
+import br.edu.unilasalle.si.supermarketinventorymanagement.utils.Strings;
+
+@WebServlet("/add-product")
+public class InsertProductServlet extends HttpServlet {
+	private static final long serialVersionUID = -5829015103497485206L;
+
+	public InsertProductServlet() {
+        super();
+    }
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ConnectionFactory factory = new ConnectionFactory();
+		Connection connection = null;
+		try {
+			connection = factory.createConnection();
+			if (request.getParameter("action").trim().equalsIgnoreCase("view")) {
+				ISubcategoryDAO dao = new SubcategoryDAO(connection);
+				List<Subcategory> subcategories = dao.list();
+
+				request.setAttribute("subcategories", subcategories);
+
+				System.out.println("InsertProductServlet :: view :: subcategories: " + subcategories);
+
+				RequestDispatcher despachante = request.getRequestDispatcher("/add-product.jsp");
+				despachante.forward(request, response);
+
+			} else if (request.getParameter("action").trim().equalsIgnoreCase("insert")) {
+				Product product = new Product();
+				product.setSku(Strings.emptyIfNull(request.getParameter("sku")));
+				product.setName(Strings.emptyIfNull(request.getParameter("name")));
+				product.setDescription(Strings.emptyIfNull(request.getParameter("description")));
+				product.setSubcategoryId(Integer.parseInt(request.getParameter("subcategory")));
+				product.setPurchasePrice(Strings.emptyIfNull(request.getParameter("purchasePrice")).replace("R$", ""));
+				product.setSalePrice(Strings.emptyIfNull(request.getParameter("salePrice")).replace("R$", ""));
+				product.setUnitOfMeasurement(Strings.emptyIfNull(request.getParameter("unitOfMeasurement")));
+				product.setBarCode(Strings.emptyIfNull(request.getParameter("barCode")));
+				product.setDeleted(false);
+
+				System.out.println("InsertProductServlet :: insert :: product: " + product);
+
+				IProductDAO dao = new ProductDAO(connection);
+				dao.insert(product);
+
+				String message = "Product successfully inserted!";
+				request.setAttribute("message", message);
+				RequestDispatcher rd = request.getRequestDispatcher("/list-products");
+				rd.forward(request, response);
+			}
+    		
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			request.setAttribute("message", "UNKNOWN ERROR");
+			RequestDispatcher rd = request.getRequestDispatcher("/add-product.jsp");
+	        rd.forward(request, response);
+		} finally {
+			factory.closeConnection(connection);
+		}
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
+
+}

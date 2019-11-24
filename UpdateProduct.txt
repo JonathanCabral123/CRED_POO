@@ -1,0 +1,95 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.control;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.ProductDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.SubcategoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.IProductDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.ISubcategoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.model.Product;
+import br.edu.unilasalle.si.supermarketinventorymanagement.model.Subcategory;
+import br.edu.unilasalle.si.supermarketinventorymanagement.utils.ConnectionFactory;
+import br.edu.unilasalle.si.supermarketinventorymanagement.utils.Strings;
+
+@WebServlet("/update-product")
+public class UpdateProductServlet extends HttpServlet {
+	private static final long serialVersionUID = 430240684442267530L;
+
+	public UpdateProductServlet() {
+        super();
+    }
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ConnectionFactory factory = new ConnectionFactory();
+		Connection connection = null;
+		try {
+			connection = factory.createConnection();
+			IProductDAO dao = new ProductDAO(connection);
+			ISubcategoryDAO scdao = new SubcategoryDAO(connection); 
+    	
+			if (request.getParameter("action").trim().equalsIgnoreCase("view")) {
+				Product product = dao.findById(Integer.valueOf((String) request.getParameter("id"))); 
+				product.setPurchasePrice(Strings.isNotEmpty(product.getPurchasePrice())?"R$" + Strings.emptyIfNull(product.getPurchasePrice()):"");
+				product.setSalePrice(Strings.isNotEmpty(product.getSalePrice())?"R$" + Strings.emptyIfNull(product.getSalePrice()):"");
+				
+				List<Subcategory> subcategories = scdao.list(); 
+				
+				String message = "Product successfully found!";
+	    		request.setAttribute("message", message);
+	    		request.setAttribute("product", product);
+	    		request.setAttribute("subcategories", subcategories);
+	    		
+	    		System.out.println("UpdateProductServlet :: view :: product: " + product);
+	    		
+	    		RequestDispatcher despachante = request.getRequestDispatcher("/update-product.jsp");
+	    		despachante.forward(request, response);
+				
+			} else if (request.getParameter("action").trim().equalsIgnoreCase("update")) {
+				Product product = new Product();
+				product.setId(Integer.parseInt(request.getParameter("id")));
+				product.setSku(Strings.emptyIfNull(request.getParameter("sku"))); 
+				product.setName(Strings.emptyIfNull(request.getParameter("name"))); 
+				product.setDescription(Strings.emptyIfNull(request.getParameter("description"))); 
+				product.setSubcategoryId(Integer.parseInt(request.getParameter("subcategory")));
+				product.setPurchasePrice(Strings.emptyIfNull(request.getParameter("purchasePrice")).replace("R$", "")); 
+				product.setSalePrice(Strings.emptyIfNull(request.getParameter("salePrice")).replace("R$", "")); 
+				product.setUnitOfMeasurement(Strings.emptyIfNull(request.getParameter("unitOfMeasurement"))); 
+				product.setBarCode(Strings.emptyIfNull(request.getParameter("barCode")));
+				product.setDeleted(false);
+				
+				System.out.println("UpdateProductServlet :: update :: product: " + product);
+	    		
+	    		dao.update(product);
+	    		
+	    		String message = "Product successfully changed!";
+	    		request.setAttribute("message", message);
+	    		RequestDispatcher despachante = request.getRequestDispatcher("/list-products");
+	    		
+	    		despachante.forward(request, response);
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			
+			request.setAttribute("message", "UNKNOWN ERROR");
+			RequestDispatcher rd = request.getRequestDispatcher("/update-product.jsp");
+	        rd.forward(request, response);
+		} finally {
+			factory.closeConnection(connection);
+		}
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
+
+}

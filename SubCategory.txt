@@ -1,0 +1,125 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.ISubcategoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.model.Subcategory;
+
+public class SubcategoryDAO implements ISubcategoryDAO {
+	private Connection connection = null;
+
+	public SubcategoryDAO(Connection connection) {
+		this.connection = connection;
+	}
+
+	@Override
+	public void insert(Subcategory subCategory) throws SQLException {
+
+		String SQL = "INSERT INTO tb_subcategory (ds_name, ds_description, fk_category_id, nr_deleted, dt_insert, ds_iusername) "
+				+ " VALUES (?, ?, ?, ?, now(), 'system')";
+
+		PreparedStatement ps = this.connection.prepareStatement(SQL);
+		ps.setString(1, subCategory.getName());
+		ps.setString(2, subCategory.getDescription());
+		ps.setInt(3, subCategory.getCategoryId());
+		ps.setBoolean(4, subCategory.isDeleted());
+
+		ps.execute();
+
+	}
+
+	@Override
+	public List<Subcategory> list() throws SQLException {
+		
+		List<Subcategory> subcategories = new ArrayList<Subcategory>();
+		ResultSet rs = null;
+		
+		String SQL = "SELECT sc.id, sc.ds_name, sc.ds_description, sc.fk_category_id, c.ds_name, sc.nr_deleted "
+				 + " FROM tb_subcategory sc, tb_category c"
+				 + " WHERE c.id=sc.fk_category_id "
+				 + " 	AND c.nr_deleted=0 "
+				 + "	AND sc.nr_deleted=0 "
+				 + " ORDER BY sc.id";
+		
+		PreparedStatement ps = this.connection.prepareStatement(SQL);
+		rs = ps.executeQuery();
+		
+		while (rs.next()) {
+			int id = rs.getInt(1);
+			String name = rs.getString(2);
+			String description = rs.getString(3);
+			int categoryId = rs.getInt(4);
+			String categoryName = rs.getString(5);
+			boolean deleted = rs.getBoolean(6);
+			
+			Subcategory sc = new Subcategory(id, name, description, categoryId, categoryName, deleted);
+
+			subcategories.add(sc);
+		}
+		
+		return subcategories;
+	}
+
+	@Override
+	public Boolean delete(int id) throws SQLException {
+
+		String SQL = "UPDATE tb_subcategory SET nr_deleted=1  WHERE id = ?";
+
+		PreparedStatement ps = this.connection.prepareStatement(SQL);
+		ps.setInt(1, id);
+
+		return ps.execute();
+	}
+
+	@Override
+	public Boolean update(Subcategory category) throws SQLException {
+
+		String SQL = "UPDATE tb_subcategory SET ds_name=?, ds_description=?, fk_category_id=?, nr_deleted=?, dt_update=now(), ds_uusername='system' WHERE id = ?";
+
+		PreparedStatement ps = this.connection.prepareStatement(SQL);
+		ps.setString(1, category.getName());
+		ps.setString(2, category.getDescription());
+		ps.setInt(3, category.getCategoryId());
+		ps.setInt(4, 0);
+		ps.setInt(5, category.getId());
+
+		return ps.execute();
+	}
+
+	@Override
+	public Subcategory findById(int _id) throws SQLException {
+		ResultSet rs = null;
+		Subcategory subcategory = null;
+
+		String SQL = "SELECT sc.id, sc.ds_name, sc.ds_description, sc.fk_category_id, c.ds_name, sc.nr_deleted "
+				 + " FROM tb_subcategory sc, tb_category c "
+				 + " WHERE c.id=sc.fk_category_id "
+				 + " 	AND c.nr_deleted=0 "
+				 + "	AND sc.nr_deleted=0 "
+				 + "	AND sc.id = ?";
+
+		PreparedStatement ps = this.connection.prepareStatement(SQL);
+		ps.setInt(1, _id);
+
+		rs = ps.executeQuery();
+
+		if (rs.next()) {
+
+			int id = rs.getInt(1);
+			String name = rs.getString(2);
+			String description = rs.getString(3);
+			int categoryId = rs.getInt(4);
+			String categoryName = rs.getString(5);
+			boolean deleted = rs.getBoolean(6);
+			
+			subcategory = new Subcategory(id, name, description, categoryId, categoryName, deleted);
+
+		}
+		return subcategory;
+	}
+}

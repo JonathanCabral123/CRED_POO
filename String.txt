@@ -1,0 +1,32 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.utils;
+
+public class Strings {
+	private Strings() {
+	}
+
+	public static String emptyIfNull(String param) {
+		if (param == null || (param != null && !param.trim().equals("") && param.trim().equalsIgnoreCase("null"))
+				|| (param != null && !param.trim().equals("") && param.trim().equalsIgnoreCase("undefined"))) {
+			return "";
+		} else {
+			return param.trim();
+		}
+	}
+
+	public static boolean isNotEmpty(String param) {
+		if (!isEmpty(param)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public static boolean isEmpty(String param) {
+		if (param == null || param.isEmpty() || (param != null && param.trim().equals("null"))
+				|| (param != null && param.trim().equals("undefined"))) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}

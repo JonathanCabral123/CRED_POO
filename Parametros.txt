@@ -1,0 +1,7 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.utils;
+
+public interface Parameters {
+	public static String db_url = "jdbc:mysql://localhost:3306/inventory_management?useTimezone=true&serverTimezone=UTC";
+	public static String db_user = "crud_user";
+	public static String db_password = "QLY72jnuCcxnzJBBFNKp";
+}

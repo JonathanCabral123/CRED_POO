@@ -1,0 +1,79 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.control;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.InventoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.ProductDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.IInventoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.IProductDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.model.Inventory;
+import br.edu.unilasalle.si.supermarketinventorymanagement.model.Product;
+import br.edu.unilasalle.si.supermarketinventorymanagement.utils.ConnectionFactory;
+
+@WebServlet("/add-inventory")
+public class InsertInventoryServlet extends HttpServlet {
+	private static final long serialVersionUID = -5829015103497485206L;
+
+	public InsertInventoryServlet() {
+        super();
+    }
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ConnectionFactory factory = new ConnectionFactory();
+		Connection connection = null;
+		try {
+			connection = factory.createConnection();
+			if (request.getParameter("action").trim().equalsIgnoreCase("view")) {
+				IProductDAO dao = new ProductDAO(connection);
+				List<Product> products = dao.list();
+
+				request.setAttribute("products", products);
+
+				System.out.println("InsertInventoryServlet :: view :: products: " + products);
+
+				RequestDispatcher despachante = request.getRequestDispatcher("/add-inventory.jsp");
+				despachante.forward(request, response);
+
+			} else if (request.getParameter("action").trim().equalsIgnoreCase("insert")) {
+				Inventory inventory = new Inventory();
+				inventory.setStockLevel(Integer.parseInt(request.getParameter("stockLevel")));
+				inventory.setMinimumStockLevel(Integer.parseInt(request.getParameter("minimumStockLevel")));
+				inventory.setMaximumStockLevel(Integer.parseInt(request.getParameter("maximumStockLevel")));
+				inventory.setProductId(Integer.parseInt(request.getParameter("product")));
+				inventory.setDeleted(false);
+
+				System.out.println("InsertInventoryServlet :: insert :: inventory: " + inventory);
+
+				IInventoryDAO dao = new InventoryDAO(connection);
+				dao.insert(inventory);
+
+				String message = "Successfully inserted!";
+				request.setAttribute("message", message);
+				RequestDispatcher rd = request.getRequestDispatcher("/list-inventories");
+				rd.forward(request, response);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			request.setAttribute("message", "UNKNOWN ERROR");
+			RequestDispatcher rd = request.getRequestDispatcher("/add-inventory.jsp");
+	        rd.forward(request, response);
+		} finally {
+			factory.closeConnection(connection);
+		}
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
+
+}

@@ -1,0 +1,87 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.control;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.InventoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.ProductDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.IInventoryDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.dao.interfaces.IProductDAO;
+import br.edu.unilasalle.si.supermarketinventorymanagement.model.Inventory;
+import br.edu.unilasalle.si.supermarketinventorymanagement.model.Product;
+import br.edu.unilasalle.si.supermarketinventorymanagement.utils.ConnectionFactory;
+
+@WebServlet("/update-inventory")
+public class UpdateInventoryServlet extends HttpServlet {
+	private static final long serialVersionUID = 6068577127002138917L;
+
+	public UpdateInventoryServlet() {
+        super();
+    }
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ConnectionFactory factory = new ConnectionFactory();
+		Connection connection = null;
+		try {
+			connection = factory.createConnection();
+			IInventoryDAO dao = new InventoryDAO(connection); 
+			IProductDAO pdao = new ProductDAO(connection);
+    	
+			if (request.getParameter("action").trim().equalsIgnoreCase("view")) {
+				Inventory inventory = dao.findById(Integer.valueOf((String) request.getParameter("id"))); 
+				List<Product> products = pdao.list();
+				
+				String message = "Successfully found!";
+	    		request.setAttribute("message", message);
+	    		request.setAttribute("inventory", inventory);
+	    		request.setAttribute("products", products);
+	    		
+	    		System.out.println("UpdateInventoryServlet :: view :: inventory: " + inventory);
+	    		
+	    		RequestDispatcher despachante = request.getRequestDispatcher("/update-inventory.jsp");
+	    		despachante.forward(request, response);
+				
+			} else if (request.getParameter("action").trim().equalsIgnoreCase("update")) {
+				Inventory inventory = new Inventory();
+				inventory.setId(Integer.parseInt(request.getParameter("id")));
+				inventory.setStockLevel(Integer.parseInt(request.getParameter("stockLevel")));
+				inventory.setMinimumStockLevel(Integer.parseInt(request.getParameter("minimumStockLevel")));
+				inventory.setMaximumStockLevel(Integer.parseInt(request.getParameter("maximumStockLevel")));
+				inventory.setProductId(Integer.parseInt(request.getParameter("product")));
+				inventory.setDeleted(false);
+				
+				System.out.println("UpdateInventoryServlet :: update :: inventory: " + inventory);
+	    		
+	    		dao.update(inventory);
+	    		
+	    		String message = "Successfully changed!";
+	    		request.setAttribute("message", message);
+	    		RequestDispatcher despachante = request.getRequestDispatcher("/list-inventories");
+	    		
+	    		despachante.forward(request, response);
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			
+			request.setAttribute("message", "UNKNOWN ERROR");
+			RequestDispatcher rd = request.getRequestDispatcher("/update-inventory.jsp");
+	        rd.forward(request, response);
+		} finally {
+			factory.closeConnection(connection);
+		}
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
+
+}

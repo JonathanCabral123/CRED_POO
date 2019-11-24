@@ -1,0 +1,195 @@
+package br.edu.unilasalle.si.supermarketinventorymanagement.model;
+
+import java.io.Serializable;
+import java.util.Date;
+
+public class Product implements Serializable {
+	private static final long serialVersionUID = -6361225410549869489L;
+
+	private int id;
+	private String sku;
+	private String name;
+	private String description;
+	private int subcategoryId;
+	private String subcategoryName;
+	private String purchasePrice;
+	private String salePrice;
+	private String unitOfMeasurement;
+	private String barCode;
+	private boolean deleted;
+	private Date dtInsert;
+	private String iUsername;
+	private Date dtUpdate;
+	private String uUsename;
+
+	public Product() {
+		super();
+	}
+
+	public Product(int id, String sku, String name, String description, int subcategoryId, String subcategoryName,
+			String purchasePrice, String salePrice, String unitOfMeasurement, String barCode, boolean deleted) {
+		super();
+		this.id = id;
+		this.sku = sku;
+		this.name = name;
+		this.description = description;
+		this.subcategoryId = subcategoryId;
+		this.subcategoryName = subcategoryName;
+		this.purchasePrice = purchasePrice;
+		this.salePrice = salePrice;
+		this.unitOfMeasurement = unitOfMeasurement;
+		this.barCode = barCode;
+		this.deleted = deleted;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getSku() {
+		return sku;
+	}
+
+	public void setSku(String sku) {
+		this.sku = sku;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public int getSubcategoryId() {
+		return subcategoryId;
+	}
+
+	public void setSubcategoryId(int subcategoryId) {
+		this.subcategoryId = subcategoryId;
+	}
+
+	public String getSubcategoryName() {
+		return subcategoryName;
+	}
+
+	public void setSubcategoryName(String subcategoryName) {
+		this.subcategoryName = subcategoryName;
+	}
+
+	public String getPurchasePrice() {
+		return purchasePrice;
+	}
+
+	public void setPurchasePrice(String purchasePrice) {
+		this.purchasePrice = purchasePrice;
+	}
+
+	public String getSalePrice() {
+		return salePrice;
+	}
+
+	public void setSalePrice(String salePrice) {
+		this.salePrice = salePrice;
+	}
+
+	public String getUnitOfMeasurement() {
+		return unitOfMeasurement;
+	}
+
+	public void setUnitOfMeasurement(String unitOfMeasurement) {
+		this.unitOfMeasurement = unitOfMeasurement;
+	}
+
+	public String getBarCode() {
+		return barCode;
+	}
+
+	public void setBarCode(String barCode) {
+		this.barCode = barCode;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
+
+	public Date getDtInsert() {
+		return dtInsert;
+	}
+
+	public void setDtInsert(Date dtInsert) {
+		this.dtInsert = dtInsert;
+	}
+
+	public String getiUsername() {
+		return iUsername;
+	}
+
+	public void setiUsername(String iUsername) {
+		this.iUsername = iUsername;
+	}
+
+	public Date getDtUpdate() {
+		return dtUpdate;
+	}
+
+	public void setDtUpdate(Date dtUpdate) {
+		this.dtUpdate = dtUpdate;
+	}
+
+	public String getuUsename() {
+		return uUsename;
+	}
+
+	public void setuUsename(String uUsename) {
+		this.uUsename = uUsename;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Product other = (Product) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Product [id=" + id + ", sku=" + sku + ", name=" + name + ", description=" + description
+				+ ", subcategoryId=" + subcategoryId + ", subcategoryName=" + subcategoryName + ", purchasePrice="
+				+ purchasePrice + ", salePrice=" + salePrice + ", unitOfMeasurement=" + unitOfMeasurement + ", barCode="
+				+ barCode + ", deleted=" + deleted + ", dtInsert=" + dtInsert + ", iUsername=" + iUsername
+				+ ", dtUpdate=" + dtUpdate + ", uUsename=" + uUsename + "]";
+	}
+}
